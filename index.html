@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html>
+  <!-- 
+    【準備】
+      ・チーム名/文字の倍率を入力
+    【操作方法】
+      ・Shiftキー + 左クリック : 対戦中（黄色ハイライト）
+      ・Shiftキー + 右クリック : 対戦中解除（黄色ハイライトを解除）
+      ・左ダブルクリック       : 勝ち上がり
+      ・右クリック            ：勝ち上がり解除
+  -->
+<head>
+  <meta charset="UTF-8">
+  <title>TournamentBest24</title>
+  <script>
+    (function(d) {
+      var config = {
+        kitId: 'haq7bnm',
+        scriptTimeout: 3000,
+        async: true
+      },
+      h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+    })(document);
+  </script>
+  <style>
+    :root {
+      /* 色・透明度の一括管理 */
+      /*--neon-color: #00ff00;       ネオンの発光色（黄緑）*/
+      --neon-color: #C1A6FF;       /* 初期状態：パープル */
+      --neon-color-win: #FF00FF;   /* 勝利時：マゼンタ */
+      --core-color: #ffffff;      /* 線の芯の色（白推奨） */
+      --default-zabuton: #ffffffe1;    /* 通常時の矩形塗りつぶし色 */
+      --default-text: #ffffff;    /* 通常時の文字色 */
+      --transparent: transparent;   /* 透明 */
+      --bg-color: #333333;        /* 確認用背景色 */
+    }
+    body{ 
+      user-select: none;
+      margin: 0;
+      overflow: scroll;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      background-color: var(--bg-color);  /*確認用！ */
+      font-family: "ff-din-paneuropean", "noto-sans-cjk-jp", sans-serif;/*フォント指定 */
+    }
+    ::-webkit-scrollbar { display: none;}
+
+    text {
+      /*stroke-width: 5.0px;         縁取りの太さ（適宜調整してください） */
+      /*paint-order: stroke;         縁取りを文字の下に配置して読みやすくする */
+      font-weight: bold;          /* 太字 */
+      pointer-events: none;       /* クリック不可 */
+      fill: var(--default-text);  /* テキスト色をデフォルトカラーに */
+      /*stroke: var(--default-zabuton);  テキストの縁取りをデフォルト色に */
+      font-family: "ff-din-paneuropean", "noto-sans-cjk-jp", sans-serif;/*フォント指定 */
+    }
+    
+    /* ネオン処理のクラス */
+    .neon {
+      stroke: var(--core-color) !important;
+      transition: 0.3s;
+    }
+
+    use {
+      fill: none;
+      stroke: none;
+    }
+
+    /* パープルネオン（初期・対戦中） */
+    use[href^="#rect"].neon { 
+      filter: url(#neon-glow-rect) !important; 
+      stroke: var(--neon-color) !important; 
+      stroke-width: 5px;
+    }
+    use[href^="#path"].neon { 
+      filter: url(#neon-glow-path) !important; 
+      stroke: var(--neon-color) !important; 
+      stroke-width: 6px;
+    }
+
+    /* マゼンタネオン（勝利時） */
+    .win-neon {
+        filter: url(#neon-glow-win) !important;
+        stroke: var(--neon-color-win) !important;
+        stroke-width: 6px !important;
+        transition: 0.3s;
+    }
+
+    /* 透明化用クラス */
+    .hide {
+      fill: var(--transparent) !important;
+      stroke: var(--transparent) !important;
+    }
+    /* クリック可能な要素のカーソル */
+    .clickable-rect {
+      cursor: pointer;
+      pointer-events: all; 
+    }
+  </style>
+</head>
+<body>
+  <svg id="mySVG" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!--座標確認用方眼紙
+    <g id="square paper">
+      <defs>
+        <pattern id="square" width="10" height="10" patternUnits="userSpaceOnUse" >
+          <rect width="10" height="10" style="fill:none;stroke:#999;stroke-width:1px"/>
+        </pattern>
+        <pattern id="quad" width="100" height="100" patternUnits="userSpaceOnUse" >
+          <rect width="100" height="100" style="stroke:#000;stroke-width:2px" fill="url(#square)"/>
+        </pattern>
+      </defs>
+      <rect width=100% height=100% fill="url(#quad)" style="stroke:#000;stroke-width:2px"/>
+    </g>
+    -->
+    <defs>
+      <path id="path_0_top" d="M 150 25 L 275 25 L 275 50" stroke-width="5" />
+      <path id="path_0_bot" d="M 150 125 L 275 125 L 275 100" stroke-width="5" />
+      <path id="path_1_top" d="M 150 25 L 200 25 L 200 65" stroke-width="5" />
+      <path id="path_1_bot" d="M 150 155 L 200 155 L 200 115" stroke-width="5" />
+      <path id="path_2_top" d="M 150 25 L 180 25 L 180 125" stroke-width="5" />
+      <path id="path_2_bot" d="M 150 285 L 180 285 L 180 185" stroke-width="5" />
+      <path id="path_3_top" d="M 190 30 L 240 30 L 240 260" stroke-width="5" />
+      <path id="path_3_bot" d="M 190 550 L 240 550 L 240 320" stroke-width="5" />
+      <path id="path_4_top" d="M 190 30 L 310 30 L 310 -90" stroke-width="5" />
+      <rect id="rect_0_top" x="0" y="0" width="150" height="50" />
+      <rect id="rect_0_bot" x="0" y="100" width="150" height="50" />
+      <rect id="rect_1_top" x="0" y="0" width="150" height="50" />
+      <rect id="rect_1_bot" x="0" y="130" width="150" height="50" />
+      <rect id="rect_2_top" x="0" y="0" width="150" height="50" />
+      <rect id="rect_2_bot" x="0" y="260" width="150" height="50" />
+      <rect id="rect_3_top" x="0" y="0" width="190" height="60" />
+      <rect id="rect_3_bot" x="0" y="520" width="190" height="60" />
+      <rect id="rect_4_top" x="0" y="0" width="190" height="60" />
+      <rect id="rect_5_top" x="0" y="0" width="360" height="90" />
+    </defs>
+    
+    <defs>
+      <filter id="neon-glow-rect" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="small-blur" />
+        <feGaussianBlur in="SourceAlpha" stdDeviation="10" result="large-blur" />
+        <feFlood flood-color="var(--neon-color)" result="color" />
+        <feComposite in="color" in2="small-blur" operator="in" result="neon-core" />
+        <feComposite in="color" in2="large-blur" operator="in" result="neon-halo" />
+        <feMerge>
+          <feMergeNode in="neon-halo" /> <feMergeNode in="neon-core" /> <feMergeNode in="neon-core" /> <feMergeNode in="neon-core" /> <feMergeNode in="SourceGraphic" /> </feMerge>
+      </filter>
+
+      <filter id="neon-glow-path" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="5" result="wide-blur" />
+        <feGaussianBlur in="SourceAlpha" stdDeviation="1.5" result="tight-blur" />
+        <feFlood flood-color="var(--neon-color)" result="neon-flood" />
+        <feComposite in="neon-flood" in2="wide-blur" operator="in" result="neon-halo" />
+        <feComposite in="neon-flood" in2="tight-blur" operator="in" result="neon-thick-line" />
+        <feMerge>
+          <feMergeNode in="neon-halo" />       <feMergeNode in="neon-thick-line" /> <feMergeNode in="neon-thick-line" /> <feMergeNode in="SourceGraphic" />    </feMerge>
+      </filter>
+      
+      <filter id="neon-glow-win" x="-100%" y="-100%" width="300%" height="300%">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="4" result="blur" />
+        <feFlood flood-color="var(--neon-color-win)" result="color" />
+        <feComposite in="color" in2="blur" operator="in" result="glow" />
+        <feMerge>
+          <feMergeNode in="glow" /><feMergeNode in="glow" /><feMergeNode in="SourceGraphic" /></feMerge>
+      </filter>
+      
+    </defs>
+
+    <g transform="translate(100, 40)" id="match_0_1" data-next="match_1_1" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_2">
+      <use id="path0_1" href="#path_0_top" fill="none" stroke="white" />
+      <use id="rect0_1" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_1" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 40)" id="match_0_2" data-next="match_1_1" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_1">
+      <use id="path0_2" href="#path_0_bot" fill="none" stroke="white" />
+      <use id="rect0_2" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_2" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 300)" id="match_0_5" data-next="match_1_3" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_6">
+      <use id="path0_5" href="#path_0_top" fill="none" stroke="white" />
+      <use id="rect0_5" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_5" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 300)" id="match_0_6" data-next="match_1_3" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_5">
+      <use id="path0_6" href="#path_0_bot" fill="none" stroke="white" />
+      <use id="rect0_6" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_6" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 560)" id="match_0_9" data-next="match_1_5" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_10">
+      <use id="path0_9" href="#path_0_top" fill="none" stroke="white" />
+      <use id="rect0_9" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_9" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 560)" id="match_0_10" data-next="match_1_5" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_9">
+      <use id="path0_10" href="#path_0_bot" fill="none" stroke="white" />
+      <use id="rect0_10" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_10" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 820)" id="match_0_13" data-next="match_1_7" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_14">
+      <use id="path0_13" href="#path_0_top" fill="none" stroke="white" />
+      <use id="rect0_13" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_13" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(100, 820)" id="match_0_14" data-next="match_1_7" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_13">
+      <use id="path0_14" href="#path_0_bot" fill="none" stroke="white" />
+      <use id="rect0_14" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_14" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 40)" id="match_0_17" data-next="match_1_9" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_18">
+      <use id="path0_17" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_17" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_17" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 40)" id="match_0_18" data-next="match_1_9" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_17">
+      <use id="path0_18" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_18" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_18" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 300)" id="match_0_21" data-next="match_1_11" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_22">
+      <use id="path0_21" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_21" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_21" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 300)" id="match_0_22" data-next="match_1_11" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_21">
+      <use id="path0_22" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_22" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_22" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 560)" id="match_0_25" data-next="match_1_13" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_26">
+      <use id="path0_25" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_25" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_25" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 560)" id="match_0_26" data-next="match_1_13" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_25">
+      <use id="path0_26" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_26" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_26" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 820)" id="match_0_29" data-next="match_1_15" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_30">
+      <use id="path0_29" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_29" href="#rect_0_top" fill="white" class="clickable-rect" />
+      <text id="text0_29" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1670, 820)" id="match_0_30" data-next="match_1_15" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_29">
+      <use id="path0_30" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect0_30" href="#rect_0_bot" fill="white" class="clickable-rect" />
+      <text id="text0_30" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+
+    <g transform="translate(300, 90)" id="match_1_1" data-next="match_2_1" data-prev-top="match_0_1" data-prev-bottom="match_0_2" data-opponent="match_1_2">
+      <use id="path1_1" href="#path_1_top" fill="none" stroke="white" />
+      <use id="rect1_1" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_1" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(300, 90)" id="match_1_2" data-next="match_2_1" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_1">
+      <use id="path1_2" href="#path_1_bot" fill="none" stroke="white" />
+      <use id="rect1_2" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_2" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(300, 350)" id="match_1_3" data-next="match_2_2" data-prev-top="match_0_5" data-prev-bottom="match_0_6" data-opponent="match_1_4">
+      <use id="path1_3" href="#path_1_top" fill="none" stroke="white" />
+      <use id="rect1_3" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_3" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(300, 350)" id="match_1_4" data-next="match_2_2" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_3">
+      <use id="path1_4" href="#path_1_bot" fill="none" stroke="white" />
+      <use id="rect1_4" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_4" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(300, 610)" id="match_1_5" data-next="match_2_3" data-prev-top="match_0_9" data-prev-bottom="match_0_10" data-opponent="match_1_6">
+      <use id="path1_5" href="#path_1_top" fill="none" stroke="white" />
+      <use id="rect1_5" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_5" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>   
+    <g transform="translate(300, 610)" id="match_1_6" data-next="match_2_3" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_5">
+      <use id="path1_6" href="#path_1_bot" fill="none" stroke="white" />
+      <use id="rect1_6" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_6" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(300, 870)" id="match_1_7" data-next="match_2_4" data-prev-top="match_0_13" data-prev-bottom="match_0_14" data-opponent="match_1_8">
+      <use id="path1_7" href="#path_1_top" fill="none" stroke="white" />
+      <use id="rect1_7" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_7" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(300, 870)" id="match_1_8" data-next="match_2_4" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_7">
+      <use id="path1_8" href="#path_1_bot" fill="none" stroke="white" />
+      <use id="rect1_8" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_8" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 90)" id="match_1_9" data-next="match_2_5" data-prev-top="match_0_17" data-prev-bottom="match_0_18" data-opponent="match_1_10">
+      <use id="path1_9" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_9" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_9" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 90)" id="match_1_10" data-next="match_2_5" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_9">
+      <use id="path1_10" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_10" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_10" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 350)" id="match_1_11" data-next="match_2_6" data-prev-top="match_0_21" data-prev-bottom="match_0_22" data-opponent="match_1_12">
+      <use id="path1_11" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_11" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_11" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 350)" id="match_1_12" data-next="match_2_6" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_11">
+      <use id="path1_12" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_12" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_12" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 610)" id="match_1_13" data-next="match_2_7" data-prev-top="match_0_25" data-prev-bottom="match_0_26" data-opponent="match_1_14">
+      <use id="path1_13" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_13" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_13" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>   
+    <g transform="translate(1470, 610)" id="match_1_14" data-next="match_2_7" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_13">
+      <use id="path1_14" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_14" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_14" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 870)" id="match_1_15" data-next="match_2_8" data-prev-top="match_0_29" data-prev-bottom="match_0_30" data-opponent="match_1_16">
+      <use id="path1_15" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_15" href="#rect_1_top" fill="white" class="clickable-rect" />
+      <text id="text1_15" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1470, 870)" id="match_1_16" data-next="match_2_8" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_15">
+      <use id="path1_16" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect1_16" href="#rect_1_bot" fill="white" class="clickable-rect" />
+      <text id="text1_16" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+
+    <g transform="translate(420, 155)" id="match_2_1" data-next="match_3_1" data-prev-top="match_1_1" data-prev-bottom="match_1_2" data-opponent="match_2_2">
+      <use id="path2_1" href="#path_2_top" fill="none" stroke="white" />
+      <use id="rect2_1" href="#rect_2_top" fill="white" class="clickable-rect" />
+      <text id="text2_1" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(420, 155)" id="match_2_2" data-next="match_3_1" data-prev-top="match_1_3" data-prev-bottom="match_1_4" data-opponent="match_2_1">
+      <use id="path2_2" href="#path_2_bot" fill="none" stroke="white" />
+      <use id="rect2_2" href="#rect_2_bot" fill="white" class="clickable-rect" />
+      <text id="text2_2" font-size="25" x="75" y="285" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(420, 675)" id="match_2_3" data-next="match_3_2" data-prev-top="match_1_5" data-prev-bottom="match_1_6" data-opponent="match_2_4">
+      <use id="path2_3" href="#path_2_top" fill="none" stroke="white" />
+      <use id="rect2_3" href="#rect_2_top" fill="white" class="clickable-rect" />
+      <text id="text2_3" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(420, 675)" id="match_2_4" data-next="match_3_2" data-prev-top="match_1_7" data-prev-bottom="match_1_8" data-opponent="match_2_3">
+      <use id="path2_4" href="#path_2_bot" fill="none" stroke="white" />
+      <use id="rect2_4" href="#rect_2_bot" fill="white" class="clickable-rect" />
+      <text id="text2_4" font-size="25" x="75" y="285" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1350, 155)" id="match_2_5" data-next="match_3_3" data-prev-top="match_1_9" data-prev-bottom="match_1_10" data-opponent="match_2_6">
+      <use id="path2_5" href="#path_2_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect2_5" href="#rect_2_top" fill="white" class="clickable-rect" />
+      <text id="text2_5" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1350, 155)" id="match_2_6" data-next="match_3_3" data-prev-top="match_1_11" data-prev-bottom="match_1_12" data-opponent="match_2_5">
+      <use id="path2_6" href="#path_2_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect2_6" href="#rect_2_bot" fill="white" class="clickable-rect" />
+      <text id="text2_6" font-size="25" x="75" y="285" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1350, 675)" id="match_2_7" data-next="match_3_4" data-prev-top="match_1_13" data-prev-bottom="match_1_14" data-opponent="match_2_8">
+      <use id="path2_7" href="#path_2_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect2_7" href="#rect_2_top" fill="white" class="clickable-rect" />
+      <text id="text2_7" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+    <g transform="translate(1350, 675)" id="match_2_8" data-next="match_3_4" data-prev-top="match_1_15" data-prev-bottom="match_1_16" data-opponent="match_2_7">
+      <use id="path2_8" href="#path_2_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
+      <use id="rect2_8" href="#rect_2_bot" fill="white" class="clickable-rect" />
+      <text id="text2_8" font-size="25" x="75" y="285" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+    </g>
+
+    <g transform="translate(505, 280)" id="match_3_1" data-next="match_4_1" data-prev-top="match_2_1" data-prev-bottom="match_2_2" data-opponent="match_3_2">
+      <use id="path3_1" href="#path_3_top" fill="none" stroke="white" />
+      <use id="rect3_1" href="#rect_3_top" fill="white" class="clickable-rect" />
+      <text id="text3_1" font-size="25"  x="95" y="30" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="95 30"></text>
+    </g>
+    <g transform="translate(505, 280)" id="match_3_2" data-next="match_4_1" data-prev-top="match_2_3" data-prev-bottom="match_2_4" data-opponent="match_3_1">
+      <use id="path3_2" href="#path_3_bot" fill="none" stroke="white" />
+      <use id="rect3_2" href="#rect_3_bot" fill="white" class="clickable-rect" />
+      <text id="text3_2" font-size="25"  x="95" y="550" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="95 30"></text>
+    </g>
+    <g transform="translate(1225, 280)" id="match_3_3" data-next="match_4_2" data-prev-top="match_2_5" data-prev-bottom="match_2_6" data-opponent="match_3_4">
+      <use id="path3_3" href="#path_3_top" fill="none" stroke="white" transform="scale(-1,1)" x="-190" />
+      <use id="rect3_3" href="#rect_3_top" fill="white" class="clickable-rect" />
+      <text id="text3_3" font-size="25"  x="95" y="30" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="95 30"></text>
+    </g>
+    <g transform="translate(1225, 280)" id="match_3_4" data-next="match_4_2" data-prev-top="match_2_7" data-prev-bottom="match_2_8" data-opponent="match_3_3">
+      <use id="path3_4" href="#path_3_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-190" />
+      <use id="rect3_4" href="#rect_3_bot" fill="white" class="clickable-rect" />
+      <text id="text3_4" font-size="25"  x="95" y="550" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="95 30"></text>
+    </g>
+
+    <g transform="translate(650, 540)" id="match_4_1" data-next="match_5_1" data-prev-top="match_3_1" data-prev-bottom="match_3_2" data-opponent="match_4_2">
+      <use id="path4_1" href="#path_4_top" fill="none" stroke="white" />
+      <use id="rect4_1" href="#rect_4_top" fill="white" class="clickable-rect" />
+      <text id="text4_1" font-size="25" x="95" y="30" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="95 30"></text>
+    </g>
+    <g transform="translate(1080, 540)" id="match_4_2" data-next="match_5_1" data-prev-top="match_3_3" data-prev-bottom="match_3_4" data-opponent="match_4_1">
+      <use id="path4_2" href="#path_4_top" fill="none" stroke="white" transform="scale(-1,1)" x="-190" />
+      <use id="rect4_2" href="#rect_4_top" fill="white" class="clickable-rect" />
+      <text id="text4_2" font-size="25" x="95" y="30" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="95 30"></text>
+    </g>
+    
+    <g transform="translate(780, 360)" id="match_5_1" data-next="none" data-prev-top="match_4_1" data-prev-bottom="match_4_2" data-opponent="none">
+      <use id="rect5_1" href="#rect_5_top" fill="white" class="clickable-rect" />
+      <text id="text5_1" font-size="40" x="180" y="45" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="180 45"></text>
+    </g>
+  </svg>
+  <script src="teams.js"></script>
+  <script>
+    //色の定義
+    const NEON = 'neon';
+    const WIN_NEON = 'win-neon';
+    const HIDE = 'hide';
+    
+    // 初期状態：すべての要素をパープルに
+    document.querySelectorAll('use[href^="#rect"], use[href^="#path"]').forEach(el => {
+        el.classList.add(NEON); 
+    });
+
+    // 初期表示
+    text0_1.textContent = team0_1_Name;     text0_1.setAttribute('transform', `scale(${team0_1_Scale},1)`);
+    text0_2.textContent = team0_2_Name;     text0_2.setAttribute('transform', `scale(${team0_2_Scale},1)`);
+    text0_5.textContent = team0_5_Name;     text0_5.setAttribute('transform', `scale(${team0_5_Scale},1)`);
+    text0_6.textContent = team0_6_Name;     text0_6.setAttribute('transform', `scale(${team0_6_Scale},1)`);
+    text0_9.textContent = team0_9_Name;     text0_9.setAttribute('transform', `scale(${team0_9_Scale},1)`);
+    text0_10.textContent = team0_10_Name;     text0_10.setAttribute('transform', `scale(${team0_10_Scale},1)`);
+    text0_13.textContent = team0_13_Name;     text0_13.setAttribute('transform', `scale(${team0_13_Scale},1)`);
+    text0_14.textContent = team0_14_Name;     text0_14.setAttribute('transform', `scale(${team0_14_Scale},1)`);
+    text0_17.textContent = team0_17_Name;     text0_17.setAttribute('transform', `scale(${team0_17_Scale},1)`);
+    text0_18.textContent = team0_18_Name;     text0_18.setAttribute('transform', `scale(${team0_18_Scale},1)`);
+    text0_21.textContent = team0_21_Name;     text0_21.setAttribute('transform', `scale(${team0_21_Scale},1)`);
+    text0_22.textContent = team0_22_Name;     text0_22.setAttribute('transform', `scale(${team0_22_Scale},1)`);
+    text0_25.textContent = team0_25_Name;     text0_25.setAttribute('transform', `scale(${team0_25_Scale},1)`);
+    text0_26.textContent = team0_26_Name;     text0_26.setAttribute('transform', `scale(${team0_26_Scale},1)`);
+    text0_29.textContent = team0_29_Name;     text0_29.setAttribute('transform', `scale(${team0_29_Scale},1)`);
+    text0_30.textContent = team0_30_Name;     text0_30.setAttribute('transform', `scale(${team0_30_Scale},1)`);
+    text1_2.textContent = team1_2_Name;     text1_2.setAttribute('transform', `scale(${team1_2_Scale},1)`);
+    text1_4.textContent = team1_4_Name;     text1_4.setAttribute('transform', `scale(${team1_4_Scale},1)`);
+    text1_6.textContent = team1_6_Name;     text1_6.setAttribute('transform', `scale(${team1_6_Scale},1)`);
+    text1_8.textContent = team1_8_Name;     text1_8.setAttribute('transform', `scale(${team1_8_Scale},1)`);
+    text1_10.textContent = team1_10_Name;   text1_10.setAttribute('transform', `scale(${team1_10_Scale},1)`);
+    text1_12.textContent = team1_12_Name;   text1_12.setAttribute('transform', `scale(${team1_12_Scale},1)`);
+    text1_14.textContent = team1_14_Name;   text1_14.setAttribute('transform', `scale(${team1_14_Scale},1)`);
+    text1_16.textContent = team1_16_Name;   text1_16.setAttribute('transform', `scale(${team1_16_Scale},1)`);
+
+    // クリックイベントハンドラを追加
+    // 全てのクリック用要素（clickable-rect）を取得してループ処理
+    document.querySelectorAll('.clickable-rect').forEach(rect => {
+        const group = rect.closest('g'); // 親の <g> 要素を取得
+            
+        // 1. 左ダブルクリック：勝ち上がり
+        rect.addEventListener('dblclick', () => {
+          const nextGroup = document.getElementById(group.dataset.next); 
+          const opponentGroup = document.getElementById(group.dataset.opponent);
+          if (!nextGroup) return; //勝ち上がりが無ければ処理をパスする。
+
+          const myPath = group.querySelector('use[id^="path"]');
+          const myText = group.querySelector('text');
+          const nextText = nextGroup.querySelector('text');
+          const opponentPath = opponentGroup.querySelector('use[id^="path"]');
+          const opponentText = opponentGroup.querySelector('text');
+          
+
+          // 自分のパスをマゼンタに、相手を消灯（または初期色）
+          if(myPath) {
+              myPath.classList.remove(NEON);
+              myPath.classList.add(WIN_NEON);
+          }
+          if (opponentPath) {
+              opponentPath.classList.remove(WIN_NEON);
+              opponentPath.classList.add(NEON);
+          }
+
+          /* テキスト透明化処理 
+          myText.classList.add(HIDE); //自身のテキストを透明化。
+          opponentText.classList.remove(HIDE);//相手のテキスト透明化を解除。
+          */
+
+          // 次の試合へ名前とスケールをコピー
+          nextText.textContent = myText.textContent;
+          nextText.setAttribute('transform', myText.getAttribute('transform'));
+
+          // 全ての勝利ネオンをリセット（ネオン解除）
+          document.querySelectorAll('use[href^="#rect"].' + WIN_NEON).forEach(el => el.classList.remove(WIN_NEON));
+          document.querySelectorAll('use[href^="#rect"]').forEach(el => el.classList.add(NEON));
+        
+          //勝ち上がり線の描画順の変更
+          if (opponentGroup) {opponentGroup.after(group);}
+        });
+      
+        // 2. 右クリック：勝ち上がり解除
+        rect.addEventListener('contextmenu', (e) => {
+          e.preventDefault(); //右クリックした時にメニューが出ないようにする
+          const prevTop = document.getElementById(group.dataset.prevTop);
+          const prevBottom = document.getElementById(group.dataset.prevBottom);
+          
+          // 前の試合のパスとテキストを安全にリセット
+          [prevTop, prevBottom].forEach(prev => {
+            if (prev) {
+              const p = prev.querySelector('use[href^="#path"]');
+              const t = prev.querySelector('text');
+              if (p) {
+                p.classList.remove(WIN_NEON)
+                p.classList.add(NEON);
+              }  //１つ前のパスのネオンを消す
+              if (t) t.classList.remove(HIDE);  //１つ前のテキスト透明化を解除。
+              group.querySelector('text').textContent = ""; //自身のテキストを削除
+            }
+          });
+
+          // 全ての勝利ネオンをリセット（ネオン解除）
+          document.querySelectorAll('use[href^="#rect"].' + WIN_NEON).forEach(el => el.classList.remove(WIN_NEON));
+          document.querySelectorAll('use[href^="#rect"]').forEach(el => el.classList.add(NEON));
+
+        });
+        // 3. Shift + 左クリック：対戦中ハイライト
+        rect.addEventListener('click', (e) => {
+            if (e.shiftKey) {
+              // 全ての勝利ネオンをリセット（ネオン解除）
+              document.querySelectorAll('use[href^="#rect"].' + WIN_NEON).forEach(el => el.classList.remove(WIN_NEON));
+              document.querySelectorAll('use[href^="#rect"]').forEach(el => el.classList.add(NEON));
+              
+              //ネオン処理
+              const myRect = group.querySelector('use[id^="rect"]');
+              const opponentRect = document.getElementById(group.dataset.opponent);
+              if (myRect){
+                myRect.classList.remove(NEON);
+                myRect.classList.add(WIN_NEON);
+              } 
+              if (opponentRect) {
+                opponentRect.querySelector('use[id^="rect"]').classList.remove(NEON)
+                opponentRect.querySelector('use[id^="rect"]').classList.add(WIN_NEON);
+              } 
+            }
+        });   
+    });
+
+    /* 座標調整用なので基本コメントアウト
+    // クリックされたマウスの座標をコンソールに出す
+    const svgElement = document.getElementById('mySVG');
+    svgElement.addEventListener('click', (event) => {
+      const x = event.offsetX;
+      const y = event.offsetY;
+    console.log(`クリックされた座標: (${x}, ${y})`);
+    });
+    */
+  </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+    // テキストの内容を定義
+let team1_2_Scale = 1;   const team1_2_Name = "Unchangedeel";
+let team1_10_Scale = 1;   const team1_10_Name = "GOOD FOOT";
+let team1_6_Scale = 1;   const team1_6_Name = "BULL'sNot";
+let team1_14_Scale = 1;   const team1_14_Name = "NEXT GENERATION";
+let team1_16_Scale = 1;   const team1_16_Name = "Not Stain";
+let team1_8_Scale = 1;   const team1_8_Name = "BEFFEE WASEDA";
+let team1_12_Scale = 1;   const team1_12_Name = "STYLE SUMMIT CREW";
+let team1_4_Scale = 1;   const team1_4_Name = "solshe";
+let team0_29_Scale = 1;   const team0_29_Name = "SEN";
+let team0_13_Scale = 1;   const team0_13_Name = "Female province busterz";
+let team0_25_Scale = 1;   const team0_25_Name = "Nebulasmoco";
+let team0_9_Scale = 1;   const team0_9_Name = "REALCRIME squad";
+let team0_21_Scale = 1;   const team0_21_Name = "飲酒倶楽部";
+let team0_5_Scale = 1;   const team0_5_Name = "kyushudanji";
+let team0_17_Scale = 1;   const team0_17_Name = "HOODIZM";
+let team0_1_Scale = 1;   const team0_1_Name = "SCWB";
+let team0_2_Scale = 1;   const team0_2_Name = "Churariko";
+let team0_18_Scale = 1;   const team0_18_Name = "JUST GEGUN";
+let team0_6_Scale = 1;   const team0_6_Name = "BalRisus";
+let team0_22_Scale = 1;   const team0_22_Name = "Longtime challengers";
+let team0_10_Scale = 1;   const team0_10_Name = "36";
+let team0_26_Scale = 1;   const team0_26_Name = "Think Local";
+let team0_14_Scale = 1;   const team0_14_Name = "BRONCO";
+let team0_30_Scale = 1;   const team0_30_Name = "Rock It Down";
