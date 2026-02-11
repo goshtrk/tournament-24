@@ -1,38 +1,27 @@
 <!DOCTYPE html>
 <html>
   <!-- 
-    【準備】
-      ・チーム名/文字の倍率を入力
     【操作方法】
-      ・Shiftキー + 左クリック : 対戦中（黄色ハイライト）
-      ・Shiftキー + 右クリック : 対戦中解除（黄色ハイライトを解除）
+      ・Shiftキー + 左クリック : 対戦中（ハイライト）
+      ・Shiftキー + 右クリック : 対戦中解除（ハイライトを解除）
       ・左ダブルクリック       : 勝ち上がり
       ・右クリック            ：勝ち上がり解除
   -->
 <head>
   <meta charset="UTF-8">
   <title>TournamentBest24</title>
-  <script>
-    (function(d) {
-      var config = {
-        kitId: 'haq7bnm',
-        scriptTimeout: 3000,
-        async: true
-      },
-      h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
-    })(document);
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <style>
     :root {
       /* 色・透明度の一括管理 */
       /*--neon-color: #00ff00;       ネオンの発光色（黄緑）*/
-      --neon-color: #C1A6FF;       /* 初期状態：パープル */
-      --neon-color-win: #FF00FF;   /* 勝利時：マゼンタ */
+      --neon-color: #ffffff;       /* 初期状態：パープル#C1A6FF */
+      --neon-color-win: #46ff52;   /* 勝利時：マゼンタ */
       --core-color: #ffffff;      /* 線の芯の色（白推奨） */
       --default-zabuton: #ffffffe1;    /* 通常時の矩形塗りつぶし色 */
       --default-text: #ffffff;    /* 通常時の文字色 */
       --transparent: transparent;   /* 透明 */
-      --bg-color: #333333;        /* 確認用背景色 */
+      /*--bg-color: #333333;         確認用背景色 */
     }
     body{ 
       user-select: none;
@@ -40,10 +29,29 @@
       overflow: scroll;
       -ms-overflow-style: none;
       scrollbar-width: none;
-      background-color: var(--bg-color);  /*確認用！ */
-      font-family: "ff-din-paneuropean", "noto-sans-cjk-jp", sans-serif;/*フォント指定 */
+      /*background-color: var(--bg-color);  確認用！ */
+      /*font-family: 'Roboto', sans-serif;    フォント指定 */
     }
     ::-webkit-scrollbar { display: none;}
+    /* --- 動画背景のスタイリング --- */
+    .video-background {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -100; /* SVG（z-index: 1以上）より後ろに配置 */
+      object-fit: cover; /* 画面いっぱいにリサイズ */
+    }
+
+    /* SVGを動画の上に重ねる設定 */
+    #mySVG {
+      position: relative;
+      z-index: 10;
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
 
     text {
       /*stroke-width: 5.0px;         縁取りの太さ（適宜調整してください） */
@@ -52,7 +60,6 @@
       pointer-events: none;       /* クリック不可 */
       fill: var(--default-text);  /* テキスト色をデフォルトカラーに */
       /*stroke: var(--default-zabuton);  テキストの縁取りをデフォルト色に */
-      font-family: "ff-din-paneuropean", "noto-sans-cjk-jp", sans-serif;/*フォント指定 */
     }
     
     /* ネオン処理のクラス */
@@ -99,6 +106,10 @@
   </style>
 </head>
 <body>
+  <video autoplay muted loop playsinline class="video-background">
+    <source src="FUTURESQUAD_26_1st_Clean_logo_.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
   <svg id="mySVG" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
     <!--座標確認用方眼紙
     <g id="square paper">
@@ -406,6 +417,31 @@
       <text id="text5_1" font-size="40" x="180" y="45" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="180 45"></text>
     </g>
   </svg>
+
+<div style="
+    position: fixed;
+    bottom: 30px;      /* 画面下からの距離 */
+    left: 50%;         /* 左端を画面中央へ */
+    transform: translateX(-50%); /* 自身の幅の半分だけ左に戻して完全中央へ */
+    background: rgba(0, 0, 0, 0.7); /* 動画背景で見やすいよう黒透過に変更 */
+    color: #fff;       /* 文字色を白に */
+    padding: 15px 30px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-family: sans-serif;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    pointer-events: none;
+    z-index: 100;      /* 動画やSVGより前面にくるように */
+    text-align: center; /* 中のテキストもセンタリング */
+  ">
+    <h4 style="margin: 0 0 8px 0; font-size: 16px; letter-spacing: 1px;">【操作方法】</h4>
+    <p style="margin: 0; font-size: 14px; line-height: 1.6; white-space: nowrap;">
+      ・Shift + 左クリック : 対戦中ハイライト<br>
+      ・Shift + 右クリック : ハイライト解除<br>
+      ・左ダブルクリック : 勝ち上がり / 右クリック ： 解除
+    </p>
+  </div>
+
   <script src="teams.js"></script>
   <script>
     //色の定義
