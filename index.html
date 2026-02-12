@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html>
   <!-- 
+    【準備】
+      ・チーム名をteam.jsに入力
     【操作方法】
       ・Shiftキー + 左クリック : 対戦中（ハイライト）
-      ・Shiftキー + 右クリック : 対戦中解除（ハイライトを解除）
-      ・左ダブルクリック       : 勝ち上がり
-      ・右クリック            ：勝ち上がり解除
+      ・左ダブルクリック       : 勝ち上がり&ハイライト解除
+      ・右クリック            ：勝ち上がり解除&ハイライト解除
   -->
 <head>
   <meta charset="UTF-8">
   <title>TournamentBest24</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.typekit.net/kmm5cat.css">
+  <script>
+    (function(d) {
+      var config = {
+        kitId: 'afz4kci',
+        scriptTimeout: 3000,
+        async: true
+      },
+      h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+    })(document);
+  </script>
+  
   <style>
     :root {
       /* 色・透明度の一括管理 */
-      /*--neon-color: #00ff00;       ネオンの発光色（黄緑）*/
-      --neon-color: #ffffff;       /* 初期状態：パープル#C1A6FF */
-      --neon-color-win: #46ff52;   /* 勝利時：マゼンタ */
+      --neon-color: #C1A6FF;       /* 初期状態 */
+      --neon-color-win: #46ff52;   /* 勝利時 */
       --core-color: #ffffff;      /* 線の芯の色（白推奨） */
-      --default-zabuton: #ffffffe1;    /* 通常時の矩形塗りつぶし色 */
-      --default-text: #ffffff;    /* 通常時の文字色 */
+      --default-zabuton: #ffffff;    /* 通常時の矩形塗りつぶし色 */
+      --default-text: #000000;    /* 通常時の文字色 */
       --transparent: transparent;   /* 透明 */
       /*--bg-color: #333333;         確認用背景色 */
     }
@@ -29,10 +40,11 @@
       overflow: scroll;
       -ms-overflow-style: none;
       scrollbar-width: none;
+      font-family: "ff-din-paneuropean", "noto-sans-cjk-jp", sans-serif;/*フォント指定 */
       /*background-color: var(--bg-color);  確認用！ */
-      /*font-family: 'Roboto', sans-serif;    フォント指定 */
     }
     ::-webkit-scrollbar { display: none;}
+
     /* --- 動画背景のスタイリング --- */
     .video-background {
       position: fixed;
@@ -52,14 +64,15 @@
       width: 100vw;
       height: 100vh;
     }
-
+    
     text {
-      /*stroke-width: 5.0px;         縁取りの太さ（適宜調整してください） */
-      /*paint-order: stroke;         縁取りを文字の下に配置して読みやすくする */
-      font-weight: bold;          /* 太字 */
+      font-weight: nomal;           /*通常 */
+      stroke: var(--default-zabuton);  /*テキストの縁取りをデフォルト色に */
+      stroke-width: 5.0px;         /*縁取りの太さ（適宜調整してください） */
+      paint-order: stroke;         /*縁取りを文字の下に配置して読みやすくする */
       pointer-events: none;       /* クリック不可 */
       fill: var(--default-text);  /* テキスト色をデフォルトカラーに */
-      /*stroke: var(--default-zabuton);  テキストの縁取りをデフォルト色に */
+      font-family: "ff-din-paneuropean", "noto-sans-cjk-jp", sans-serif;/*フォント指定 */
     }
     
     /* ネオン処理のクラス */
@@ -73,8 +86,9 @@
       stroke: none;
     }
 
-    /* パープルネオン（初期・対戦中） */
+    /* 初期ネオン */
     use[href^="#rect"].neon { 
+      fill: var(--default-zabuton);
       filter: url(#neon-glow-rect) !important; 
       stroke: var(--neon-color) !important; 
       stroke-width: 5px;
@@ -84,9 +98,16 @@
       stroke: var(--neon-color) !important; 
       stroke-width: 6px;
     }
-
-    /* マゼンタネオン（勝利時） */
+    /* 勝利時ネオン */
     .win-neon {
+        filter: url(#neon-glow-win) !important;
+        stroke: var(--neon-color-win) !important;
+        stroke-width: 6px !important;
+        transition: 0.3s;
+    }
+    /*対戦中ネオン */
+    .match-neon {
+        fill: var(--default-zabuton);
         filter: url(#neon-glow-win) !important;
         stroke: var(--neon-color-win) !important;
         stroke-width: 6px !important;
@@ -103,13 +124,43 @@
       cursor: pointer;
       pointer-events: all; 
     }
+
+    /* 操作説明パネルのスタイル */
+    .instruction-panel {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 15px 30px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      pointer-events: none;
+      z-index: 100;
+      text-align: center;
+    }
+    .instruction-panel h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+    .instruction-panel p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: nowrap;
+    }
   </style>
 </head>
 <body>
+  <!--背景動画(普段はコメントアウト)-->
   <video autoplay muted loop playsinline class="video-background">
     <source src="10sec_.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
+  
   <svg id="mySVG" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
     <!--座標確認用方眼紙
     <g id="square paper">
@@ -418,67 +469,75 @@
     </g>
   </svg>
 
-<div style="
-    position: fixed;
-    bottom: 30px;      /* 画面下からの距離 */
-    left: 50%;         /* 左端を画面中央へ */
-    transform: translateX(-50%); /* 自身の幅の半分だけ左に戻して完全中央へ */
-    background: rgba(0, 0, 0, 0.7); /* 動画背景で見やすいよう黒透過に変更 */
-    color: #fff;       /* 文字色を白に */
-    padding: 15px 30px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    font-family: sans-serif;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-    pointer-events: none;
-    z-index: 100;      /* 動画やSVGより前面にくるように */
-    text-align: center; /* 中のテキストもセンタリング */
-  ">
-    <h4 style="margin: 0 0 8px 0; font-size: 16px; letter-spacing: 1px;">【操作方法】</h4>
-    <p style="margin: 0; font-size: 14px; line-height: 1.6; white-space: nowrap;">
-      ・Shift + 左クリック : 対戦中ハイライト<br>
-      ・Shift + 右クリック : ハイライト解除<br>
-      ・左ダブルクリック : 勝ち上がり / 右クリック ： 解除
+  <!--説明用(普段はコメントアウト)
+  <div class="instruction-panel">
+    <h4>【操作方法】</h4>
+    <p>
+      ・Shiftキー + 左クリック : 対戦中（ハイライト）<br>
+      ・左ダブルクリック       : 勝ち上がり&ハイライト解除<br>
+      ・右クリック            ：勝ち上がり解除&ハイライト解除
     </p>
   </div>
-
+  -->
+  
   <script src="teams.js"></script>
   <script>
+    /**
+    * テキストが指定した幅(maxWidth)に収まるまでフォントサイズを下げる
+    * @param {SVGTextElement} el - text要素
+    * @param {string} name - チーム名
+    * @param {number} maxWidth - 枠の最大幅(px)
+    */
+    function adjustFontSize(el, name, maxWidth) {
+      // その枠における最大サイズからスタート
+      let fontSize = el.id.includes('text5') ? 40 : 25;
+      el.style.fontSize = fontSize + "px";
+      el.textContent = name; // 改行はせず、1行で表示
+
+      // 枠からはみ出している間、サイズを下げる
+      // ただし、14pxを下回る場合はループを抜けて、はみ出しを許容する
+      while (el.getBBox().width > maxWidth && fontSize > 14) {
+        fontSize -= 1;
+        el.style.fontSize = fontSize + "px";
+      }
+    }
+
     //色の定義
     const NEON = 'neon';
+    const MATCH_NEON = 'match-neon';
     const WIN_NEON = 'win-neon';
     const HIDE = 'hide';
     
-    // 初期状態：すべての要素をパープルに
+    // 初期状態：すべての要素をネオンに
     document.querySelectorAll('use[href^="#rect"], use[href^="#path"]').forEach(el => {
         el.classList.add(NEON); 
     });
 
     // 初期表示
-    text0_1.textContent = team0_1_Name;     text0_1.setAttribute('transform', `scale(${team0_1_Scale},1)`);
-    text0_2.textContent = team0_2_Name;     text0_2.setAttribute('transform', `scale(${team0_2_Scale},1)`);
-    text0_5.textContent = team0_5_Name;     text0_5.setAttribute('transform', `scale(${team0_5_Scale},1)`);
-    text0_6.textContent = team0_6_Name;     text0_6.setAttribute('transform', `scale(${team0_6_Scale},1)`);
-    text0_9.textContent = team0_9_Name;     text0_9.setAttribute('transform', `scale(${team0_9_Scale},1)`);
-    text0_10.textContent = team0_10_Name;     text0_10.setAttribute('transform', `scale(${team0_10_Scale},1)`);
-    text0_13.textContent = team0_13_Name;     text0_13.setAttribute('transform', `scale(${team0_13_Scale},1)`);
-    text0_14.textContent = team0_14_Name;     text0_14.setAttribute('transform', `scale(${team0_14_Scale},1)`);
-    text0_17.textContent = team0_17_Name;     text0_17.setAttribute('transform', `scale(${team0_17_Scale},1)`);
-    text0_18.textContent = team0_18_Name;     text0_18.setAttribute('transform', `scale(${team0_18_Scale},1)`);
-    text0_21.textContent = team0_21_Name;     text0_21.setAttribute('transform', `scale(${team0_21_Scale},1)`);
-    text0_22.textContent = team0_22_Name;     text0_22.setAttribute('transform', `scale(${team0_22_Scale},1)`);
-    text0_25.textContent = team0_25_Name;     text0_25.setAttribute('transform', `scale(${team0_25_Scale},1)`);
-    text0_26.textContent = team0_26_Name;     text0_26.setAttribute('transform', `scale(${team0_26_Scale},1)`);
-    text0_29.textContent = team0_29_Name;     text0_29.setAttribute('transform', `scale(${team0_29_Scale},1)`);
-    text0_30.textContent = team0_30_Name;     text0_30.setAttribute('transform', `scale(${team0_30_Scale},1)`);
-    text1_2.textContent = team1_2_Name;     text1_2.setAttribute('transform', `scale(${team1_2_Scale},1)`);
-    text1_4.textContent = team1_4_Name;     text1_4.setAttribute('transform', `scale(${team1_4_Scale},1)`);
-    text1_6.textContent = team1_6_Name;     text1_6.setAttribute('transform', `scale(${team1_6_Scale},1)`);
-    text1_8.textContent = team1_8_Name;     text1_8.setAttribute('transform', `scale(${team1_8_Scale},1)`);
-    text1_10.textContent = team1_10_Name;   text1_10.setAttribute('transform', `scale(${team1_10_Scale},1)`);
-    text1_12.textContent = team1_12_Name;   text1_12.setAttribute('transform', `scale(${team1_12_Scale},1)`);
-    text1_14.textContent = team1_14_Name;   text1_14.setAttribute('transform', `scale(${team1_14_Scale},1)`);
-    text1_16.textContent = team1_16_Name;   text1_16.setAttribute('transform', `scale(${team1_16_Scale},1)`);
+    adjustFontSize(text0_1, team0_1_Name, 140);
+    adjustFontSize(text0_2, team0_2_Name, 140);
+    adjustFontSize(text0_5, team0_5_Name, 140);
+    adjustFontSize(text0_6, team0_6_Name, 140);
+    adjustFontSize(text0_9, team0_9_Name, 140);
+    adjustFontSize(text0_10, team0_10_Name, 140);
+    adjustFontSize(text0_13, team0_13_Name, 140);
+    adjustFontSize(text0_14, team0_14_Name, 140);
+    adjustFontSize(text0_17, team0_17_Name, 140);
+    adjustFontSize(text0_18, team0_18_Name, 140);
+    adjustFontSize(text0_21, team0_21_Name, 140);
+    adjustFontSize(text0_22, team0_22_Name, 140);
+    adjustFontSize(text0_25, team0_25_Name, 140);
+    adjustFontSize(text0_26, team0_26_Name, 140);
+    adjustFontSize(text0_29, team0_29_Name, 140);
+    adjustFontSize(text0_30, team0_30_Name, 140);
+    adjustFontSize(text1_2, team1_2_Name, 140);
+    adjustFontSize(text1_4, team1_4_Name, 140);
+    adjustFontSize(text1_6, team1_6_Name, 140);
+    adjustFontSize(text1_8, team1_8_Name, 140);
+    adjustFontSize(text1_10, team1_10_Name, 140);
+    adjustFontSize(text1_12, team1_12_Name, 140);
+    adjustFontSize(text1_14, team1_14_Name, 140);
+    adjustFontSize(text1_16, team1_16_Name, 140);  
 
     // クリックイベントハンドラを追加
     // 全てのクリック用要素（clickable-rect）を取得してループ処理
@@ -514,11 +573,13 @@
           */
 
           // 次の試合へ名前とスケールをコピー
-          nextText.textContent = myText.textContent;
-          nextText.setAttribute('transform', myText.getAttribute('transform'));
+          //nextText.innerHTML = myText.innerHTML;
+          //nextText.style.fontSize = myText.style.fontSize; // フォントサイズの設定を継承
+          let nextMaxWidth = nextText.id.includes('text5') ? 340 : (nextText.id.includes('text4') || nextText.id.includes('text3')) ? 170 : 130;
+          adjustFontSize(nextText, myText.textContent, nextMaxWidth);
 
           // 全ての勝利ネオンをリセット（ネオン解除）
-          document.querySelectorAll('use[href^="#rect"].' + WIN_NEON).forEach(el => el.classList.remove(WIN_NEON));
+          document.querySelectorAll('use[href^="#rect"].' + MATCH_NEON).forEach(el => el.classList.remove(MATCH_NEON));
           document.querySelectorAll('use[href^="#rect"]').forEach(el => el.classList.add(NEON));
         
           //勝ち上がり線の描画順の変更
@@ -546,7 +607,7 @@
           });
 
           // 全ての勝利ネオンをリセット（ネオン解除）
-          document.querySelectorAll('use[href^="#rect"].' + WIN_NEON).forEach(el => el.classList.remove(WIN_NEON));
+          document.querySelectorAll('use[href^="#rect"].' + MATCH_NEON).forEach(el => el.classList.remove(MATCH_NEON));
           document.querySelectorAll('use[href^="#rect"]').forEach(el => el.classList.add(NEON));
 
         });
@@ -554,7 +615,7 @@
         rect.addEventListener('click', (e) => {
             if (e.shiftKey) {
               // 全ての勝利ネオンをリセット（ネオン解除）
-              document.querySelectorAll('use[href^="#rect"].' + WIN_NEON).forEach(el => el.classList.remove(WIN_NEON));
+              document.querySelectorAll('use[href^="#rect"].' + MATCH_NEON).forEach(el => el.classList.remove(MATCH_NEON));
               document.querySelectorAll('use[href^="#rect"]').forEach(el => el.classList.add(NEON));
               
               //ネオン処理
@@ -562,11 +623,11 @@
               const opponentRect = document.getElementById(group.dataset.opponent);
               if (myRect){
                 myRect.classList.remove(NEON);
-                myRect.classList.add(WIN_NEON);
+                myRect.classList.add(MATCH_NEON);
               } 
               if (opponentRect) {
                 opponentRect.querySelector('use[id^="rect"]').classList.remove(NEON)
-                opponentRect.querySelector('use[id^="rect"]').classList.add(WIN_NEON);
+                opponentRect.querySelector('use[id^="rect"]').classList.add(MATCH_NEON);
               } 
             }
         });   
