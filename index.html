@@ -201,10 +201,10 @@
 </head>
 <body>
   <!--背景動画(普段はコメントアウト)-->
-  <video autoplay muted loop playsinline class="video-background">
-    <source src="10sec_.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
+    <video id="bgVideo" muted loop playsinline class="video-background" style="display: none;">
+      <source src="10sec_.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
   
   <svg id="mySVG" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="square paper" style="display: none;">
@@ -535,6 +535,12 @@
         例: text0_1, チームA
       </p>
     </div>
+    <div class="field" style="margin-top: 10px; padding-top: 5px;">
+      <label style="display: flex; align-items: center; cursor: pointer;">
+        <input type="checkbox" id="videoToggle" style="margin-right: 10px; width: 18px; height: 18px;">
+        背景動画を表示・再生する
+      </label>
+    </div>
     <div class="field" style="margin-top: 20px; border-top: 1px solid #555; padding-top: 15px;">
     <label style="display: flex; align-items: center; cursor: pointer;">
       <input type="checkbox" id="gridToggle" style="margin-right: 10px; width: 18px; height: 18px;">
@@ -727,7 +733,18 @@
         console.log("レイアウトモード: OFF");
       }
     });
-
+    // 背景動画の表示・再生切り替え
+    document.getElementById('videoToggle').addEventListener('change', function(e) {
+      const video = document.getElementById('bgVideo');
+  
+      if (e.target.checked) {
+        video.style.display = 'block'; // 表示
+        video.play();                 // 再生開始
+      } else {
+        video.pause();                // 一時停止
+        video.style.display = 'none';  // 非表示
+      }
+    });
     // マウス座標の取得処理（チェックボックスの状態を見て判断）
     const svgElement = document.getElementById('mySVG');
     svgElement.addEventListener('click', (event) => {
