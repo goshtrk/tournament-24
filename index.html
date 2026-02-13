@@ -152,18 +152,62 @@
       line-height: 1.6;
       white-space: nowrap;
     }
+    /* 管理画面（モーダル）のスタイル */
+    .admin-modal {
+      display: none; /* 初期は非表示 */
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      background: #222;
+      color: #fff;
+      padding: 20px;
+      border: 2px solid var(--neon-color);
+      border-radius: 10px;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    }
+    .admin-modal.active { display: block; }
+    .admin-modal h2 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #555; }
+    .admin-modal .field { margin-bottom: 15px; }
+    .admin-modal label { display: block; font-size: 12px; margin-bottom: 5px; color: #aaa; }
+    .admin-modal input[type="file"] { font-size: 12px; }
+    .admin-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .admin-overlay.active { display: block; }
+    .instruction-box {
+    background: rgba(255, 255, 255, 0.1); /* わずかに背景を明るく */
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 12px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .instruction-box ul {
+    list-style-type: disc;
+  }
+
+  .instruction-box li span {
+    font-weight: bold;
+  }
   </style>
 </head>
 <body>
-  <!--背景動画(普段はコメントアウト)-->
+  <!--背景動画(普段はコメントアウト)
   <video autoplay muted loop playsinline class="video-background">
     <source src="10sec_.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-  
+  -->
   <svg id="mySVG" width="1920" height="1080" viewBox="0 0 1920 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!--座標確認用方眼紙
-    <g id="square paper">
+    <g id="square paper" style="display: none;">
       <defs>
         <pattern id="square" width="10" height="10" patternUnits="userSpaceOnUse" >
           <rect width="10" height="10" style="fill:none;stroke:#999;stroke-width:1px"/>
@@ -174,7 +218,6 @@
       </defs>
       <rect width=100% height=100% fill="url(#quad)" style="stroke:#000;stroke-width:2px"/>
     </g>
-    -->
     <defs>
       <path id="path_0_top" d="M 150 25 L 275 25 L 275 50" stroke-width="5" />
       <path id="path_0_bot" d="M 150 125 L 275 125 L 275 100" stroke-width="5" />
@@ -231,82 +274,82 @@
     <g transform="translate(100, 40)" id="match_0_1" data-next="match_1_1" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_2">
       <use id="path0_1" href="#path_0_top" fill="none" stroke="white" />
       <use id="rect0_1" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_1" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_1" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 40)" id="match_0_2" data-next="match_1_1" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_1">
       <use id="path0_2" href="#path_0_bot" fill="none" stroke="white" />
       <use id="rect0_2" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_2" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_2" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 300)" id="match_0_5" data-next="match_1_3" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_6">
       <use id="path0_5" href="#path_0_top" fill="none" stroke="white" />
       <use id="rect0_5" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_5" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_5" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 300)" id="match_0_6" data-next="match_1_3" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_5">
       <use id="path0_6" href="#path_0_bot" fill="none" stroke="white" />
       <use id="rect0_6" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_6" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_6" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 560)" id="match_0_9" data-next="match_1_5" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_10">
       <use id="path0_9" href="#path_0_top" fill="none" stroke="white" />
       <use id="rect0_9" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_9" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_9" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 560)" id="match_0_10" data-next="match_1_5" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_9">
       <use id="path0_10" href="#path_0_bot" fill="none" stroke="white" />
       <use id="rect0_10" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_10" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_10" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 820)" id="match_0_13" data-next="match_1_7" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_14">
       <use id="path0_13" href="#path_0_top" fill="none" stroke="white" />
       <use id="rect0_13" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_13" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_13" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(100, 820)" id="match_0_14" data-next="match_1_7" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_13">
       <use id="path0_14" href="#path_0_bot" fill="none" stroke="white" />
       <use id="rect0_14" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_14" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_14" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 40)" id="match_0_17" data-next="match_1_9" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_18">
       <use id="path0_17" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_17" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_17" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_17" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 40)" id="match_0_18" data-next="match_1_9" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_17">
       <use id="path0_18" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_18" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_18" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_18" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 300)" id="match_0_21" data-next="match_1_11" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_22">
       <use id="path0_21" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_21" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_21" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_21" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 300)" id="match_0_22" data-next="match_1_11" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_21">
       <use id="path0_22" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_22" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_22" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_22" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 560)" id="match_0_25" data-next="match_1_13" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_26">
       <use id="path0_25" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_25" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_25" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_25" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 560)" id="match_0_26" data-next="match_1_13" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_25">
       <use id="path0_26" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_26" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_26" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_26" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 820)" id="match_0_29" data-next="match_1_15" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_30">
       <use id="path0_29" href="#path_0_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_29" href="#rect_0_top" fill="white" class="clickable-rect" />
-      <text id="text0_29" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_29" font-size="25" x="75" y="25" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1670, 820)" id="match_0_30" data-next="match_1_15" data-prev-top="none" data-prev-bottom="none" data-opponent="match_0_29">
       <use id="path0_30" href="#path_0_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect0_30" href="#rect_0_bot" fill="white" class="clickable-rect" />
-      <text id="text0_30" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text0_30" font-size="25" x="75" y="125" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
 
     <g transform="translate(300, 90)" id="match_1_1" data-next="match_2_1" data-prev-top="match_0_1" data-prev-bottom="match_0_2" data-opponent="match_1_2">
@@ -317,7 +360,7 @@
     <g transform="translate(300, 90)" id="match_1_2" data-next="match_2_1" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_1">
       <use id="path1_2" href="#path_1_bot" fill="none" stroke="white" />
       <use id="rect1_2" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_2" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_2" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(300, 350)" id="match_1_3" data-next="match_2_2" data-prev-top="match_0_5" data-prev-bottom="match_0_6" data-opponent="match_1_4">
       <use id="path1_3" href="#path_1_top" fill="none" stroke="white" />
@@ -327,7 +370,7 @@
     <g transform="translate(300, 350)" id="match_1_4" data-next="match_2_2" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_3">
       <use id="path1_4" href="#path_1_bot" fill="none" stroke="white" />
       <use id="rect1_4" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_4" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_4" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(300, 610)" id="match_1_5" data-next="match_2_3" data-prev-top="match_0_9" data-prev-bottom="match_0_10" data-opponent="match_1_6">
       <use id="path1_5" href="#path_1_top" fill="none" stroke="white" />
@@ -337,7 +380,7 @@
     <g transform="translate(300, 610)" id="match_1_6" data-next="match_2_3" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_5">
       <use id="path1_6" href="#path_1_bot" fill="none" stroke="white" />
       <use id="rect1_6" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_6" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_6" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(300, 870)" id="match_1_7" data-next="match_2_4" data-prev-top="match_0_13" data-prev-bottom="match_0_14" data-opponent="match_1_8">
       <use id="path1_7" href="#path_1_top" fill="none" stroke="white" />
@@ -347,7 +390,7 @@
     <g transform="translate(300, 870)" id="match_1_8" data-next="match_2_4" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_7">
       <use id="path1_8" href="#path_1_bot" fill="none" stroke="white" />
       <use id="rect1_8" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_8" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_8" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1470, 90)" id="match_1_9" data-next="match_2_5" data-prev-top="match_0_17" data-prev-bottom="match_0_18" data-opponent="match_1_10">
       <use id="path1_9" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
@@ -357,7 +400,7 @@
     <g transform="translate(1470, 90)" id="match_1_10" data-next="match_2_5" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_9">
       <use id="path1_10" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect1_10" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_10" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_10" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1470, 350)" id="match_1_11" data-next="match_2_6" data-prev-top="match_0_21" data-prev-bottom="match_0_22" data-opponent="match_1_12">
       <use id="path1_11" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
@@ -367,7 +410,7 @@
     <g transform="translate(1470, 350)" id="match_1_12" data-next="match_2_6" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_11">
       <use id="path1_12" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect1_12" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_12" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_12" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1470, 610)" id="match_1_13" data-next="match_2_7" data-prev-top="match_0_25" data-prev-bottom="match_0_26" data-opponent="match_1_14">
       <use id="path1_13" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
@@ -377,7 +420,7 @@
     <g transform="translate(1470, 610)" id="match_1_14" data-next="match_2_7" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_13">
       <use id="path1_14" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect1_14" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_14" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_14" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
     <g transform="translate(1470, 870)" id="match_1_15" data-next="match_2_8" data-prev-top="match_0_29" data-prev-bottom="match_0_30" data-opponent="match_1_16">
       <use id="path1_15" href="#path_1_top" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
@@ -387,7 +430,7 @@
     <g transform="translate(1470, 870)" id="match_1_16" data-next="match_2_8" data-prev-top="none" data-prev-bottom="none" data-opponent="match_1_15">
       <use id="path1_16" href="#path_1_bot" fill="none" stroke="white" transform="scale(-1,1)" x="-150" />
       <use id="rect1_16" href="#rect_1_bot" fill="white" class="clickable-rect" />
-      <text id="text1_16" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25"></text>
+      <text id="text1_16" font-size="25" x="75" y="155" fill="black" stroke="white" text-anchor="middle" dominant-baseline="middle" transform-origin="75 25" class="initial-text"></text>
     </g>
 
     <g transform="translate(420, 155)" id="match_2_1" data-next="match_3_1" data-prev-top="match_1_1" data-prev-bottom="match_1_2" data-opponent="match_2_2">
@@ -469,27 +512,48 @@
     </g>
   </svg>
 
-  <!--説明用(普段はコメントアウト)-->
-  <div class="instruction-panel">
-    <h4>【操作方法】</h4>
-    <p>
-      ・Shiftキー + 左クリック : 対戦中（ハイライト）<br>
-      ・左ダブルクリック       : 勝ち上がり&ハイライト解除<br>
-      ・右クリック            ：勝ち上がり解除&ハイライト解除
-    </p>
+  <div id="adminOverlay" class="admin-overlay"></div>
+  <div id="adminModal" class="admin-modal">
+    <h2>管理パネル</h2>
+    
+    <div class="instruction-box">
+      <h4 style="margin: 0 0 8px 0; color: #fff; font-size: 14px;">【基本操作】</h4>
+      <ul style="margin: 0; padding-left: 18px; font-size: 12px; color: #eee; line-height: 1.6;">
+        <li><span style="color: #ffeb3b;">Shift + 左クリック</span> : 対戦中（ハイライト）</li>
+        <li><span style="color: #ffeb3b;">左ダブルクリック</span> : 勝ち上がり ＆ ハイライト解除</li>
+        <li><span style="color: #ffeb3b;">右クリック</span> : 勝ち上がり解除 ＆ ハイライト解除</li>
+      </ul>
+    </div>
+
+    <div class="field">
+      <label>チーム名CSVを読み込み</label>
+      <input type="file" id="csvInput" accept=".csv">
+    </div>
+    <div class="field">
+      <p style="font-size: 11px; color: #ccc;">
+        ※CSV形式: ID, チーム名<br>
+        例: text0_1, チームA
+      </p>
+    </div>
+    <div class="field" style="margin-top: 20px; border-top: 1px solid #555; padding-top: 15px;">
+    <label style="display: flex; align-items: center; cursor: pointer;">
+      <input type="checkbox" id="gridToggle" style="margin-right: 10px; width: 18px; height: 18px;">
+      ガイド用の方眼紙を表示する※デバッグ用
+    </label>
   </div>
-  
-  
-  <script src="teams.js"></script>
+    <button onclick="toggleAdmin()">閉じる</button>
+  </div>
+  <script src="initialTeam.js"></script>
   <script>
-    /**
-    * テキストが指定した幅(maxWidth)に収まるまでフォントサイズを下げる
-    * @param {SVGTextElement} el - text要素
-    * @param {string} name - チーム名
-    * @param {number} maxWidth - 枠の最大幅(px)
-    */
+    // 初期値及びサイジングを実行 ---
+    document.querySelectorAll('.initial-text').forEach(el => {
+      const keyName = el.id.replace('text', 'team') ;
+      const teamName = TEAM_DATA[keyName] || "未入力";
+      adjustFontSize(el, teamName, 140);
+    });
+ 
+    //テキストが指定した幅(maxWidth)に収まるまでフォントサイズを下げる
     function adjustFontSize(el, name, maxWidth) {
-      // その枠における最大サイズからスタート
       let fontSize = el.id.includes('text5') ? 40 : 25;
       el.style.fontSize = fontSize + "px";
       el.textContent = name; // 改行はせず、1行で表示
@@ -512,32 +576,6 @@
     document.querySelectorAll('use[href^="#rect"], use[href^="#path"]').forEach(el => {
         el.classList.add(NEON); 
     });
-
-    // 初期表示
-    adjustFontSize(text0_1, team0_1_Name, 140);
-    adjustFontSize(text0_2, team0_2_Name, 140);
-    adjustFontSize(text0_5, team0_5_Name, 140);
-    adjustFontSize(text0_6, team0_6_Name, 140);
-    adjustFontSize(text0_9, team0_9_Name, 140);
-    adjustFontSize(text0_10, team0_10_Name, 140);
-    adjustFontSize(text0_13, team0_13_Name, 140);
-    adjustFontSize(text0_14, team0_14_Name, 140);
-    adjustFontSize(text0_17, team0_17_Name, 140);
-    adjustFontSize(text0_18, team0_18_Name, 140);
-    adjustFontSize(text0_21, team0_21_Name, 140);
-    adjustFontSize(text0_22, team0_22_Name, 140);
-    adjustFontSize(text0_25, team0_25_Name, 140);
-    adjustFontSize(text0_26, team0_26_Name, 140);
-    adjustFontSize(text0_29, team0_29_Name, 140);
-    adjustFontSize(text0_30, team0_30_Name, 140);
-    adjustFontSize(text1_2, team1_2_Name, 140);
-    adjustFontSize(text1_4, team1_4_Name, 140);
-    adjustFontSize(text1_6, team1_6_Name, 140);
-    adjustFontSize(text1_8, team1_8_Name, 140);
-    adjustFontSize(text1_10, team1_10_Name, 140);
-    adjustFontSize(text1_12, team1_12_Name, 140);
-    adjustFontSize(text1_14, team1_14_Name, 140);
-    adjustFontSize(text1_16, team1_16_Name, 140);  
 
     // クリックイベントハンドラを追加
     // 全てのクリック用要素（clickable-rect）を取得してループ処理
@@ -632,17 +670,76 @@
             }
         });   
     });
+    // --- 管理画面の制御 ---
+    function toggleAdmin() {
+      document.getElementById('adminModal').classList.toggle('active');
+      document.getElementById('adminOverlay').classList.toggle('active');
+    }
 
-    /* 座標調整用なので基本コメントアウト
-    // クリックされたマウスの座標をコンソールに出す
+    // "M" キーで管理画面を開く
+    window.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 'm') toggleAdmin();
+      if (e.key === 'Escape') {
+        document.getElementById('adminModal').classList.remove('active');
+        document.getElementById('adminOverlay').classList.remove('active');
+      }
+    });
+
+    // --- CSV読み込み処理 ---
+    document.getElementById('csvInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const text = event.target.result;
+        parseCSV(text);
+      };
+      reader.readAsText(file);
+    });
+
+    function parseCSV(data) {
+      const lines = data.split(/\r\n|\n/);
+      lines.forEach(line => {
+        const [id, name] = line.split(',');
+        if (id && name) {
+          // プレ頭文字（text）がついていない場合を考慮して補完
+          const targetId = id.startsWith('text') ? id : 'text' + id;
+          const textEl = document.getElementById(targetId);
+          if (textEl) {
+            let maxWidth = textEl.id.includes('text5') ? 340 : (textEl.id.includes('text4') || textEl.id.includes('text3')) ? 170 : 130;
+            adjustFontSize(textEl, name.trim(), maxWidth);
+          }
+        }
+      });
+      console.log("CSV loaded and applied.");
+    }
+    // 方眼紙と座標ログの統合管理
+    document.getElementById('gridToggle').addEventListener('change', function(e) {
+      const grid = document.getElementById('square paper');
+      const isChecked = e.target.checked;
+
+      if (isChecked) {
+        grid.style.display = 'block';   // 方眼紙を表示
+        console.log("レイアウトモード: ON (クリック座標の表示を開始)");
+      } else {
+        grid.style.display = 'none';    // 方眼紙を非表示
+        console.log("レイアウトモード: OFF");
+      }
+    });
+
+    // マウス座標の取得処理（チェックボックスの状態を見て判断）
     const svgElement = document.getElementById('mySVG');
     svgElement.addEventListener('click', (event) => {
-      const x = event.offsetX;
-      const y = event.offsetY;
-    console.log(`クリックされた座標: (${x}, ${y})`);
+      // チェックボックスがチェックされている時だけ実行
+      const isGridActive = document.getElementById('gridToggle').checked;
+  
+      if (isGridActive) {
+        const x = event.offsetX;
+        const y = event.offsetY;
+        console.log(`クリックされた座標: (${x}, ${y})`);
+      }
     });
-    */
   </script>
 </body>
-
 </html>
